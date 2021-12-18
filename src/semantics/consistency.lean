@@ -12,89 +12,6 @@ open  Kproof
 def sem_cons (AX : ctx) := ¬ entails AX ⊥ 
 attribute [class] sem_cons
 
-
-lemma sem_consK : sem_cons ∅ :=
-begin
-rw sem_cons,
-rw entails, 
-push_neg, 
-let f : frame := 
-{ W := ℕ,
-  W_inhabited := ⟨0⟩,
-  R := λ x y, x = y},
-use f, let v := λ n x, true,
-use v, let x := 42,
-split, intros A y h1, 
-exact false.elim h1, use x, 
-rw true_at_world, trivial 
-end
-
-
-lemma sem_consT : sem_cons T_axioms :=
-begin
-rw sem_cons, rw entails,
-push_neg,
-let f : frame := 
-{ W := ℕ,
-  W_inhabited:= ⟨0⟩,
-  R := λ x y, x = y},
-use f, let v := λ n x, true,
-use v, let x := 42,
-split, intros A y h1, 
-cases h1 with B h1, subst h1,
-intro h1, apply h1 y,
-exact rfl, use x,
-rw true_at_world, trivial
-end
-
-
-lemma sem_consS4 : sem_cons S4_axioms :=
-begin
-rw sem_cons, rw entails, push_neg,
-let f : frame := 
-{ W := ℕ,
-  W_inhabited:= ⟨0⟩,
-  R := λ x y, x = y},
-use f, let v := λ n x, true,
-use v, let x := 42,
-split, 
-intros A y h1,
-cases h1,
-cases h1 with B h1, subst h1,
-intro h1, apply h1 y,
-exact rfl,
-cases h1 with B h1, subst h1,
-intro h1, rw true_at_world at *,
-simp at *, rw true_at_world, 
-simp at *, exact h1,
-use x,
-rw true_at_world, trivial
-end
-
-
-lemma sem_consS5 : sem_cons S5_axioms :=
-begin
-rw sem_cons, rw entails, push_neg,
-let f : frame := 
-{ W := ℕ,
-  W_inhabited:= ⟨0⟩,
-  R := λ x y, x = y},
-use f, let v := λ n x, true,
-use v, let x := 42,
-split, 
-intros A y h1,
-cases h1,
-cases h1 with B h1, subst h1,
-intro h1, apply h1 y,
-exact rfl,
-cases h1 with B h1, subst h1,
-intro h1, rw true_at_world at *,
-simp at *, rw true_at_world, 
-exact h1, use x,
-rw true_at_world, trivial
-end
-
-
 -- Any axiom system that is consistent does not prove false
 lemma nprfalse (AX : ctx) (hax : sem_cons AX) : ¬  Kproof AX ⊥ :=
 begin
@@ -135,7 +52,7 @@ exact (not_and_subst phi_and_true).mpr not_contra
 end
 
 
-lemma imp_conj_imp_imp {Γ : ctx} {A B χ : form} {L : list form} : 
+lemma imp_conj_imp_imp {Γ : ctx} {A B C : form} {L : list form} : 
    Kproof Γ ((fin_conj (A::L)) ⊃ B) ↔  Kproof Γ (fin_conj L ⊃ (A ⊃ B)) :=
 begin
 split, 
@@ -244,7 +161,6 @@ intro h1, exact h1.left
 end
 
 
--- Lemma 5 from class notes
 lemma five_helper (AX : ctx) : 
   ∀ Γ : ctx, ∀ A : form, ∀ L : list form, ∀ b : form, 
   (∀ B ∈ L, B ∈ Γ ∨ B = A) →  Kproof AX (fin_conj L ⊃ b) → ∃ L',
@@ -295,7 +211,6 @@ exact h1_right,
 end
 
 
--- Lemma 6 from class notes
 lemma six_helper (AX Γ : ctx) (h : ax_consist AX Γ) :
 max_ax_consist AX Γ → ∀ A : form, A ∈ Γ ∨ (¬A) ∈ Γ :=
 begin
@@ -355,7 +270,6 @@ exact fin_conj_simp B,
 end
 
 
--- Exercise 1 from class notes
 lemma ex1help {AX Γ : ctx} {A : form} {L L' : list form} :
   (∀ B ∈ L, B ∈ Γ) →  Kproof AX (fin_conj L ⊃ A) → (∀ B ∈ L', B ∈ (insert A Γ)) 
   → ∃ L'' : list form, (∀ B ∈ L'', B ∈ Γ) ∧  Kproof AX (fin_conj L'' ⊃ fin_conj L') :=
@@ -454,11 +368,11 @@ lemma max_imp_1 {AX Γ : ctx} {A B : form} :
 begin
 intros h1 h2, rw imp_iff_not_or at h2,
 cases h2,
-have h3 : (∀ χ ∈ [¬A], χ ∈ Γ) →  Kproof AX (fin_conj [¬A] ⊃ (A ⊃ B)) → (A ⊃ B) ∈ Γ, from exercise1 h1,
+have h3 : (∀ C ∈ [¬A], C ∈ Γ) →  Kproof AX (fin_conj [¬A] ⊃ (A ⊃ B)) → (A ⊃ B) ∈ Γ, from exercise1 h1,
 simp at *, apply h3, 
 exact (max_notiff AX Γ h1 A).mp h2,
 exact cut (mp pl5 phi_and_true) (and_right_imp.mp exfalso),
-have h3 : (∀ χ ∈ [B], χ ∈ Γ) →  Kproof AX (fin_conj [B] ⊃ (A ⊃ B)) → (A ⊃ B) ∈ Γ, from exercise1 h1,
+have h3 : (∀ C ∈ [B], C ∈ Γ) →  Kproof AX (fin_conj [B] ⊃ (A ⊃ B)) → (A ⊃ B) ∈ Γ, from exercise1 h1,
 simp at *, 
 apply h3, exact h2, exact (cut (mp pl5 phi_and_true) pl1),
 end
@@ -468,7 +382,7 @@ lemma max_imp_2 {AX Γ : ctx} {A B : form} :
   max_ax_consist AX Γ → (A ⊃ B) ∈ Γ → A ∈ Γ → B ∈ Γ :=
 begin
 intros h1 h2 h3,
-have h4 : (∀ χ ∈ [A, (A ⊃ B)], χ ∈ Γ) →  Kproof AX (fin_conj [A, (A ⊃ B)] ⊃ B) → B ∈ Γ, from exercise1 h1,
+have h4 : (∀ C ∈ [A, (A ⊃ B)], C ∈ Γ) →  Kproof AX (fin_conj [A, (A ⊃ B)] ⊃ B) → B ∈ Γ, from exercise1 h1,
 simp at *, apply h4, 
 exact h3,
 exact h2,
@@ -480,7 +394,7 @@ lemma max_conj_1 {AX Γ : ctx} {A B : form} :
   max_ax_consist AX Γ → (A ∈ Γ ∧ B ∈ Γ) → (A & B) ∈ Γ :=
 begin
 intros h1 h2,
-have h3 : (∀ χ ∈ [A], χ ∈ Γ) →  Kproof AX (fin_conj [A] ⊃ (B ⊃ (A & B))) → (B ⊃ (A & B)) ∈ Γ, 
+have h3 : (∀ C ∈ [A], C ∈ Γ) →  Kproof AX (fin_conj [A] ⊃ (B ⊃ (A & B))) → (B ⊃ (A & B)) ∈ Γ, 
   from exercise1 h1,
 simp at *,
 apply max_imp_2 h1, 
@@ -492,7 +406,7 @@ lemma max_conj_2 {AX Γ : ctx} {A B : form} :
   max_ax_consist AX Γ → (A & B) ∈ Γ → A ∈ Γ :=
 begin
 intros h1 h2,
-have h3 : (∀ χ ∈ [(A & B)], χ ∈ Γ) →  Kproof AX (fin_conj [(A & B)] ⊃ A) → A ∈ Γ, 
+have h3 : (∀ C ∈ [(A & B)], C ∈ Γ) →  Kproof AX (fin_conj [(A & B)] ⊃ A) → A ∈ Γ, 
   from exercise1 h1,
 simp at *, apply h3, exact h2,
 exact (cut (mp pl5 phi_and_true) pl5)
@@ -503,7 +417,7 @@ lemma max_conj_3 {AX Γ : ctx} {A B : form} :
   max_ax_consist AX Γ → (A & B) ∈ Γ → B ∈ Γ :=
 begin
 intros h1 h2,
-have h3 : (∀ χ ∈ [(A & B)], χ ∈ Γ) →  Kproof AX (fin_conj [(A & B)] ⊃ B) → B ∈ Γ, 
+have h3 : (∀ C ∈ [(A & B)], C ∈ Γ) →  Kproof AX (fin_conj [(A & B)] ⊃ B) → B ∈ Γ, 
   from exercise1 h1,
 simp at *, apply h3, exact h2,
 exact (cut (mp pl5 phi_and_true) pl6)
@@ -587,7 +501,6 @@ exact h5, exact h6, apply h2.1
 end
 
 
--- Corollary 8 from class notes
 lemma max_ax_exists (AX : ctx) (hax : sem_cons AX) : ∃ Γ : ctx, max_ax_consist AX Γ :=
 begin
 have h1 : ax_consist AX ∅,

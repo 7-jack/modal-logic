@@ -1,7 +1,3 @@
-/-
-Copyright (c) 2021 Paula Neeley. All rights reserved.
-Author: Paula Neeley
--/
 
 import syntax.syntax data.set.basic
 local attribute [instance] classical.prop_decidable
@@ -11,14 +7,14 @@ open  Kproof
 
 ---------------------- Helper Lemmas ----------------------
 
-
+-- A → A
 lemma iden {Γ : ctx} {A : form} :
    Kproof Γ (A ⊃ A) :=
 begin
 exact mp (mp (@pl2 _ A (A ⊃ A) A) pl1) pl1
 end
 
-
+-- ⊤ is always provable
 lemma prtrue {Γ : ctx} :  Kproof Γ ⊤ := iden
 
 
@@ -42,7 +38,7 @@ induction h,
 {exact nec h_ih }
 end
 
-
+-- We are able to prove axioms
 lemma pr {Γ : ctx} {A : form} :
    Kproof (Γ ∪ A) A :=
 begin
@@ -51,9 +47,9 @@ apply or.intro_left;
 simp
 end
 
-
-lemma cut {Γ : ctx} {A B χ : form} :
-   Kproof Γ (A ⊃ B) →  Kproof Γ (B ⊃ χ) →  Kproof Γ (A ⊃ χ) :=
+-- The cut rule, 
+lemma cut {Γ : ctx} {A B C : form} :
+   Kproof Γ (A ⊃ B) →  Kproof Γ (B ⊃ C) →  Kproof Γ (A ⊃ C) :=
 begin
 intros h1 h2,
 exact mp (mp pl2 (mp pl1 h2)) h1
@@ -67,9 +63,10 @@ intro h,
 exact mp (weak h) pr 
 end
 
+-- The following build up to double negation
 
-lemma hs1 {Γ : ctx} {A B χ : form} :
-   Kproof Γ ((B ⊃ χ) ⊃ ((A ⊃ B) ⊃ (A ⊃ χ))) :=
+lemma hs1 {Γ : ctx} {A B C : form} :
+   Kproof Γ ((B ⊃ C) ⊃ ((A ⊃ B) ⊃ (A ⊃ C))) :=
 begin
 exact (mp (mp pl2 (mp pl1 pl2)) pl1)
 end
@@ -96,43 +93,43 @@ exact mp pl7 dne
 end
 
 
-lemma imp_if_imp_imp {Γ : ctx} {A B χ : form} :  Kproof Γ (A ⊃ χ) →  Kproof Γ (A ⊃ (B ⊃ χ)) :=
+lemma imp_if_imp_imp {Γ : ctx} {A B C : form} :  Kproof Γ (A ⊃ C) →  Kproof Γ (A ⊃ (B ⊃ C)) :=
 begin
 intro h1,
 exact mp (mp pl2 (mp pl1 pl1)) h1
 end
 
 
-lemma cut1 {Γ : ctx} {A B χ θ : form} :
-   Kproof Γ (θ ⊃ (A ⊃ B)) →  Kproof Γ (B ⊃ χ) →  Kproof Γ (θ ⊃ (A ⊃ χ)) :=
+lemma cut1 {Γ : ctx} {A B C θ : form} :
+   Kproof Γ (θ ⊃ (A ⊃ B)) →  Kproof Γ (B ⊃ C) →  Kproof Γ (θ ⊃ (A ⊃ C)) :=
 begin
 intros h1 h2,
 exact cut h1 (mp pl2 (mp pl1 h2))
 end
 
 
-lemma imp_switch {Γ : ctx} {A B χ : form} :  Kproof Γ (A ⊃ (B ⊃ χ)) →  Kproof Γ (B ⊃ (A ⊃ χ)) :=
+lemma imp_switch {Γ : ctx} {A B C : form} :  Kproof Γ (A ⊃ (B ⊃ C)) →  Kproof Γ (B ⊃ (A ⊃ C)) :=
 begin
 intro h1,
 exact mp (mp pl2 (mp pl1 (mp pl2 h1))) pl1
 end
 
 
-lemma l2 {Γ : ctx} {A B χ : form} :  Kproof Γ ((A ⊃ (B ⊃ χ)) ⊃ (B ⊃ (A ⊃ χ))) :=
+lemma l2 {Γ : ctx} {A B C : form} :  Kproof Γ ((A ⊃ (B ⊃ C)) ⊃ (B ⊃ (A ⊃ C))) :=
 begin
 exact (mp (mp pl2 (cut pl2 hs1)) (mp pl1 pl1))
 end
 
 
-lemma hs2 {Γ : ctx} {A B χ : form} :
-   Kproof Γ ((A ⊃ B) ⊃ ((B ⊃ χ) ⊃ (A ⊃ χ))) :=
+lemma hs2 {Γ : ctx} {A B C : form} :
+   Kproof Γ ((A ⊃ B) ⊃ ((B ⊃ C) ⊃ (A ⊃ C))) :=
 begin
 exact (mp l2 hs1)
 end
 
 
-lemma cut2 {Γ : ctx} {A B χ θ : form} :
-   Kproof Γ (A ⊃ B) →  Kproof Γ (θ ⊃ (B ⊃ χ)) →  Kproof Γ (θ ⊃ (A ⊃ χ)) :=
+lemma cut2 {Γ : ctx} {A B C θ : form} :
+   Kproof Γ (A ⊃ B) →  Kproof Γ (θ ⊃ (B ⊃ C)) →  Kproof Γ (θ ⊃ (A ⊃ C)) :=
 begin
 intros h1 h2,
 exact imp_switch (cut h1 (imp_switch h2))
@@ -157,24 +154,24 @@ exact cut h1 pl1}
 end
 
 
-lemma imp_shift {Γ : ctx} {θ A B χ : form} : 
-   Kproof Γ (θ ⊃ (A ⊃ (B ⊃ χ))) ↔  Kproof Γ (θ ⊃ (B ⊃ (A ⊃ χ))) :=
+lemma imp_shift {Γ : ctx} {θ A B C : form} : 
+   Kproof Γ (θ ⊃ (A ⊃ (B ⊃ C))) ↔  Kproof Γ (θ ⊃ (B ⊃ (A ⊃ C))) :=
 begin
 split,
 repeat {intro h1, exact cut h1 (cut2 pl1 pl2)}
 end
 
 
-lemma left_and_imp {Γ : ctx} {A B χ : form} :
-   Kproof Γ (B ⊃ ((A & B) ⊃ χ)) →  Kproof Γ ((A & B) ⊃ χ) :=
+lemma left_and_imp {Γ : ctx} {A B C : form} :
+   Kproof Γ (B ⊃ ((A & B) ⊃ C)) →  Kproof Γ ((A & B) ⊃ C) :=
 begin
 intro h1,
 exact mp double_imp (cut pl6 h1)
 end
 
 
-lemma and_right_imp {Γ : ctx} {A B χ : form} : 
-   Kproof Γ ((A & B) ⊃ χ) ↔  Kproof Γ (B ⊃ (A ⊃ χ)) :=
+lemma and_right_imp {Γ : ctx} {A B C : form} : 
+   Kproof Γ ((A & B) ⊃ C) ↔  Kproof Γ (B ⊃ (A ⊃ C)) :=
 begin
 split, 
 {intro h1,
@@ -184,8 +181,8 @@ exact left_and_imp (cut2 pl5 h1)
 end
 
 
-lemma not_and_subst {A B χ : form} {Γ : ctx} : 
-   Kproof Γ (A ↔ B) → ( Kproof Γ ¬(χ & A) ↔  Kproof Γ ¬(χ & B)) :=
+lemma not_and_subst {A B C : form} {Γ : ctx} : 
+   Kproof Γ (A ↔ B) → ( Kproof Γ ¬(C & A) ↔  Kproof Γ ¬(C & B)) :=
 begin
 intro h1, split, 
 {intro h2,
@@ -210,8 +207,8 @@ exact (mp (mp pl4 pl5) (mp (imp_switch pl4) prtrue))
 end
 
 
-lemma imp_and_and_imp {Γ : ctx} {A B χ θ : form} : 
-   Kproof Γ (((A ⊃ B) & (χ ⊃ θ))) →  Kproof Γ (((A & χ) ⊃ (B & θ))) :=
+lemma imp_and_and_imp {Γ : ctx} {A B C θ : form} : 
+   Kproof Γ (((A ⊃ B) & (C ⊃ θ))) →  Kproof Γ (((A & C) ⊃ (B & θ))) :=
 begin
 intro h,
 exact (mp double_imp (cut (cut pl5 (mp pl5 h)) (cut2 (cut pl6 (mp pl6 h)) pl4)))
@@ -263,7 +260,7 @@ exact (mp (mp pl4 (mp double_imp (cut pl5 (imp_switch (cut pl6 pl4)))))
 end
 
 
-lemma and_commute {Γ : ctx} {A B χ : form} :  Kproof Γ (((A & B) & χ) ↔ (A & (B & χ))) :=
+lemma and_commute {Γ : ctx} {A B C : form} :  Kproof Γ (((A & B) & C) ↔ (A & (B & C))) :=
 begin
 exact mp (mp pl4 (mp double_imp (imp_imp_iff_imp.mp 
   (cut (cut pl5 pl6) (cut2 pl6 (cut1 pl4 (imp_switch (cut (cut pl5 pl5) pl4)))))))) 
@@ -272,8 +269,8 @@ exact mp (mp pl4 (mp double_imp (imp_imp_iff_imp.mp
 end
 
 
-lemma imp_and_imp {Γ : ctx} {A B χ : form} : 
-   Kproof Γ (A ⊃ B) →  Kproof Γ ((χ & A) ⊃ (χ & B)) :=
+lemma imp_and_imp {Γ : ctx} {A B C : form} : 
+   Kproof Γ (A ⊃ B) →  Kproof Γ ((C & A) ⊃ (C & B)) :=
 begin
 intros h1,
 exact imp_and_and_imp (mp (mp pl4 iden) h1)
@@ -307,6 +304,8 @@ begin
 exact mp (mp pl4 (contrapos.mpr (mp kdist (nec dne)))) (contrapos.mpr (mp kdist (nec dni)))
 end
 
+
+-- The following are known as dual formulas encode how □ ≃ ¬◇¬ and ◇ ≃ ¬□¬
 
 lemma dual_equiv1 {Γ : ctx} {A : form} :  Kproof Γ ((□A) ↔ (¬(◇(¬A)))) :=
 begin

@@ -96,30 +96,10 @@ def valid_in_frame_class (A : form) (F : set (frame)) :=
 def valid_universally (A : form) := 
   ∀ f v w, true_at_world f v w A
 
-
+/- Finally, a helpful lemma regarding the moving of negation in/out -/
 lemma not_forces_imp :  ∀ f v x A, 
   (¬(true_at_world f v x A)) ↔ (true_at_world f v x (¬A)) :=
 begin
 intros f v x A, split, 
 repeat {intros h1 h2, exact h1 h2},
-end
-
-
-lemma forces_exists {f : frame} {v : nat → f.W → Prop} {x : f.W} {A : form} :
-  true_at_world f v x (◇A) ↔ ∃ y : f.W, (f.R x y ∧ true_at_world f v y A) :=
-begin
-split, intro h1,
-repeat {rw true_at_world at h1},
-have h2 := not_or_of_imp h1,
-cases h2, push_neg at h2,
-cases h2 with y h2, cases h2 with h2 h3,
-existsi (y : f.W), split, exact h2,
-have h4 := (not_forces_imp f v y (¬A)).mp h3,
-repeat {rw true_at_world at h4}, repeat {rw imp_false at h4},
-rw not_not at h4, exact h4,
-exact false.elim h2,
-intro h1, cases h1 with y h1,
-cases h1 with h1 h2,
-intro h3,
-exact absurd h2 (h3 y h1)
 end
