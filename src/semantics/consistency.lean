@@ -6,7 +6,12 @@ local attribute [instance] classical.prop_decidable
 
 open  Kproof
 
----------------------- Consistency ----------------------
+/-
+
+In this file are lemmas related to consitency (we never prove both A and ¬ A). 
+The most important is Lindenbaum's lemma.
+
+-/
 
 
 def sem_cons (AX : ctx) := ¬ entails AX ⊥ 
