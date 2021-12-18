@@ -1,7 +1,3 @@
-/-
-Copyright (c) 2021 Paula Neeley. All rights reserved.
-Author: Paula Neeley
--/
 
 import data.list data.set.basic
 

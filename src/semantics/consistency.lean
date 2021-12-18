@@ -1,4 +1,5 @@
 
+import data.list
 import syntax.syntax 
 import semantics.semantics syntax.syntaxlemmas
 import syntax.soundness order.zorn data.set.basic

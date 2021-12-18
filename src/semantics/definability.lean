@@ -1,7 +1,6 @@
 
-
 import syntax.syntax 
-import semantics.semantics paths
+import semantics.semantics
 import data.set.basic
 local attribute [instance] classical.prop_decidable
 

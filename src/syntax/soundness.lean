@@ -1,5 +1,4 @@
 
-
 import data.set.basic semantics.semantics 
 import semantics.definability syntax.syntaxlemmas
 local attribute [instance] classical.prop_decidable

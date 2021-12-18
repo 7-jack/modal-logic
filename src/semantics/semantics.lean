@@ -1,5 +1,4 @@
 
-
 import syntax.syntax
 import logic.basic data.set.basic
 local attribute [instance] classical.prop_decidable
@@ -11,8 +10,6 @@ open form
 /-
 
 We now want to define a *semantics* for our language.#check
-
-
 
 -/
 
