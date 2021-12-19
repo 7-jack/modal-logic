@@ -57,7 +57,7 @@ have h1 : ax_consist Γ (Γbox ∪ {A}),
 have h3 := five Γ Γbox A h2,
 cases h3 with L h3, cases h3 with h3 h4,
 have h5 := cut fin_conj_boxn (mp kdist (nec h4)),
-have h6 := exercise1,
+have h6 := mini_cons,
 have h7 : ∀ B ∈ (list.map □ L), B ∈ xΓ.1, 
 intros B h8, simp at *, cases h8 with a h8,
 cases h8 with h8l h8r,
@@ -149,7 +149,7 @@ intros A xΓ h1,
 have h2 : ∀ B ∈ list.nil, B ∈ xΓ.val, 
 {intros B h3, have h4 := list.ne_nil_of_length_pos (list.length_pos_of_mem h3),
 simp at *, exact false.elim h4},
-exact (truth Γ hax xΓ A).mpr (exercise1 xΓ.2 h2 (mp pl1 (ax h1)))
+exact (truth Γ hax xΓ A).mpr (mini_cons xΓ.2 h2 (mp pl1 (ax h1)))
 end
 
 

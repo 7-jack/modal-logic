@@ -10,7 +10,8 @@ open  Kproof
 /-
 
 In this file are lemmas related to consitency (we never prove both A and ¬ A). 
-The most important is Lindenbaum's lemma.
+The most important is Lindenbaum's lemma. Many thanks to the work of Paula
+Neeley whose previous work helped me when I was stuck.
 
 -/
 
@@ -276,7 +277,7 @@ exact fin_conj_simp B,
 end
 
 
-lemma ex1help {AX Γ : ctx} {A : form} {L L' : list form} :
+lemma mini_cons_help {AX Γ : ctx} {A : form} {L L' : list form} :
   (∀ B ∈ L, B ∈ Γ) →  Kproof AX (fin_conj L ⊃ A) → (∀ B ∈ L', B ∈ (insert A Γ)) 
   → ∃ L'' : list form, (∀ B ∈ L'', B ∈ Γ) ∧  Kproof AX (fin_conj L'' ⊃ fin_conj L') :=
 begin
@@ -304,7 +305,7 @@ exact imp_and_imp ih2
 end
 
 
-lemma exercise1 {AX Γ : ctx} {A : form} {L : list form} :
+lemma mini_cons {AX Γ : ctx} {A : form} {L : list form} :
   max_ax_consist AX Γ → (∀ B ∈ L, B ∈ Γ) →  Kproof AX (fin_conj L ⊃ A) → A ∈ Γ :=
 begin
 intros h1 h2 h3, 
@@ -319,7 +320,7 @@ cases h5 with L' h5,
 cases h5 with h5 h6,
 rw fin_ax_consist at h6, 
 rw not_not at h6,
-have h7 := ex1help h2 h3 h5,
+have h7 := mini_cons_help h2 h3 h5,
 cases h7 with L'' h7,
 cases h7 with h7 h8,
 apply h1 L'' h7,
@@ -331,11 +332,11 @@ lemma max_dn (AX Γ : ctx) (h : max_ax_consist AX Γ) (A : form) :
   A ∈ Γ ↔ (¬¬A) ∈ Γ :=
 begin
 split, intro h1, 
-have h2 : (∀ B ∈ [A], B ∈ Γ) →  Kproof AX (fin_conj [A] ⊃ (¬¬A)) → (¬¬A) ∈ Γ, from exercise1 h,
+have h2 : (∀ B ∈ [A], B ∈ Γ) →  Kproof AX (fin_conj [A] ⊃ (¬¬A)) → (¬¬A) ∈ Γ, from mini_cons h,
 simp at *, apply h2, exact h1,
 exact (cut (mp pl5 phi_and_true) dni), 
 intro h1,
-have h2 : (∀ B ∈ [¬¬A], B ∈ Γ) →  Kproof AX (fin_conj [¬¬A] ⊃ A) → A ∈ Γ, from exercise1 h,
+have h2 : (∀ B ∈ [¬¬A], B ∈ Γ) →  Kproof AX (fin_conj [¬¬A] ⊃ A) → A ∈ Γ, from mini_cons h,
 simp at *, apply h2, exact h1,
 exact (cut (mp pl5 phi_and_true) dne), 
 end
@@ -346,7 +347,7 @@ lemma max_boxdn (AX Γ : ctx) (h : max_ax_consist AX Γ) (A : form) :
 begin
 intro h1,
 have h2 : (∀ B ∈ [(¬□A)], B ∈ Γ) →  Kproof AX (fin_conj [(¬□A)] ⊃ (¬□(¬¬A))) → (¬□(¬¬A)) ∈ Γ, 
-  from exercise1 h,
+  from mini_cons h,
 simp at *, apply h2, exact h1, clear h2,
 exact (cut (mp pl5 phi_and_true) (mp pl5 box_dn)), 
 end
@@ -374,11 +375,11 @@ lemma max_imp_1 {AX Γ : ctx} {A B : form} :
 begin
 intros h1 h2, rw imp_iff_not_or at h2,
 cases h2,
-have h3 : (∀ C ∈ [¬A], C ∈ Γ) →  Kproof AX (fin_conj [¬A] ⊃ (A ⊃ B)) → (A ⊃ B) ∈ Γ, from exercise1 h1,
+have h3 : (∀ C ∈ [¬A], C ∈ Γ) →  Kproof AX (fin_conj [¬A] ⊃ (A ⊃ B)) → (A ⊃ B) ∈ Γ, from mini_cons h1,
 simp at *, apply h3, 
 exact (max_notiff AX Γ h1 A).mp h2,
 exact cut (mp pl5 phi_and_true) (and_right_imp.mp exfalso),
-have h3 : (∀ C ∈ [B], C ∈ Γ) →  Kproof AX (fin_conj [B] ⊃ (A ⊃ B)) → (A ⊃ B) ∈ Γ, from exercise1 h1,
+have h3 : (∀ C ∈ [B], C ∈ Γ) →  Kproof AX (fin_conj [B] ⊃ (A ⊃ B)) → (A ⊃ B) ∈ Γ, from mini_cons h1,
 simp at *, 
 apply h3, exact h2, exact (cut (mp pl5 phi_and_true) pl1),
 end
@@ -388,7 +389,7 @@ lemma max_imp_2 {AX Γ : ctx} {A B : form} :
   max_ax_consist AX Γ → (A ⊃ B) ∈ Γ → A ∈ Γ → B ∈ Γ :=
 begin
 intros h1 h2 h3,
-have h4 : (∀ C ∈ [A, (A ⊃ B)], C ∈ Γ) →  Kproof AX (fin_conj [A, (A ⊃ B)] ⊃ B) → B ∈ Γ, from exercise1 h1,
+have h4 : (∀ C ∈ [A, (A ⊃ B)], C ∈ Γ) →  Kproof AX (fin_conj [A, (A ⊃ B)] ⊃ B) → B ∈ Γ, from mini_cons h1,
 simp at *, apply h4, 
 exact h3,
 exact h2,
@@ -401,7 +402,7 @@ lemma max_conj_1 {AX Γ : ctx} {A B : form} :
 begin
 intros h1 h2,
 have h3 : (∀ C ∈ [A], C ∈ Γ) →  Kproof AX (fin_conj [A] ⊃ (B ⊃ (A & B))) → (B ⊃ (A & B)) ∈ Γ, 
-  from exercise1 h1,
+  from mini_cons h1,
 simp at *,
 apply max_imp_2 h1, 
 exact h3 h2.left (cut (mp pl5 phi_and_true) pl4), exact h2.right
@@ -413,7 +414,7 @@ lemma max_conj_2 {AX Γ : ctx} {A B : form} :
 begin
 intros h1 h2,
 have h3 : (∀ C ∈ [(A & B)], C ∈ Γ) →  Kproof AX (fin_conj [(A & B)] ⊃ A) → A ∈ Γ, 
-  from exercise1 h1,
+  from mini_cons h1,
 simp at *, apply h3, exact h2,
 exact (cut (mp pl5 phi_and_true) pl5)
 end
@@ -424,7 +425,7 @@ lemma max_conj_3 {AX Γ : ctx} {A B : form} :
 begin
 intros h1 h2,
 have h3 : (∀ C ∈ [(A & B)], C ∈ Γ) →  Kproof AX (fin_conj [(A & B)] ⊃ B) → B ∈ Γ, 
-  from exercise1 h1,
+  from mini_cons h1,
 simp at *, apply h3, exact h2,
 exact (cut (mp pl5 phi_and_true) pl6)
 end
